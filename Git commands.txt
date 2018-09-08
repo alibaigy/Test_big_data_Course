@@ -1,3 +1,0 @@
-git add .
-git commit -m "my first class"
-git push origin master
