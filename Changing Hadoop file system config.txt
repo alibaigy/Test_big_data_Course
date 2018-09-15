@@ -1,0 +1,11 @@
+[cloudera@quickstart ~]$ clear
+
+[cloudera@quickstart ~]$ locate hdfs-site.xml
+/etc/hadoop/conf.empty/hdfs-site.xml
+/etc/hadoop/conf.impala/hdfs-site.xml
+/etc/hadoop/conf.pseudo/hdfs-site.xml
+/etc/impala/conf.dist/hdfs-site.xml
+/usr/lib/hadoop-0.20-mapreduce/example-confs/conf.pseudo/hdfs-site.xml
+/usr/lib/hadoop-0.20-mapreduce/example-confs/conf.secure/hdfs-site.xml
+[cloudera@quickstart ~]$ vi /etc/hadoop/conf.pseudo/hdfs-site.xml
+[cloudera@quickstart ~]$ 
