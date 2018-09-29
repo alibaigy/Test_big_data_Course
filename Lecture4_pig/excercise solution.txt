@@ -1,0 +1,45 @@
+truck_events = LOAD 'myData/truck_event_text_partition.csv' USING PigStorage(',') AS (driverId:int , truckId:int, eventTime:chararray, eventType:chararray, longitude:double, latitude:double, eventKey:chararray, correlationId:long, driverName:chararray,routeId:long, routeName:chararray, eventDate:chararray);
+drivers = LOAD 'myData/drivers.csv' USING PigStorage(',') AS (driverId:int, name:chararray, ssn:chararray,location:chararray, certified:chararray, wage_plan:chararray); 
+timesheet = LOAD 'myData/timesheet.csv' USING PigStorage(',') AS (driverId:int,week:long,hours_logged:int,miles_logged:long); 
+
+event_not_normal = FILTER truck_events BY NOT (eventType MATCHES 'Normal'); 
+
+careless_drivers = FOREACH event_not_normal GENERATE driverId;
+
+driver_list = GROUP careless_drivers BY driverId;
+
+driver_fault = FOREACH driver_list GENERATE group AS  driverId, COUNT($1.driverId) as faults;
+
+driver_names = JOIN driver_fault BY (driverId) , drivers By (driverId);
+
+careless_driver_names = FOREACH driver_names GENERATE drivers::name,driver_fault::faults
+
+careless_driver_names = ORDER careless_driver_names BY faults desc;
+
+STORE careless_driver_names INTO 'myData/careless_drivers' USING PigStorage(',');
+
+
+
+
+-- Task2
+uncertified_drivers = FILTER drivers BY certified == 'Y';
+
+driving_uncertified = JOIN uncertified_drivers BY (driverId), timesheet BY (driverId);
+
+driving_uncertified = FOREACH driving_uncertified GENERATE uncertified_drivers::name;
+
+STORE dedupe driving_uncertified INTO 'myData/driving_uncertified' USING PigStorage(',');
+
+--Task3
+timesheet_summary = FOREACH timesheet GENERATE driverId,hours_logged,miles_logged;
+
+timesheet_summary = GROUP timesheet_summary BY driverId;
+
+timesheet_summary = FOREACH timesheet_summary GENERATE group AS driverId,SUM($1.hours_logged) AS hours, SUM($1.miles_logged) AS miles;
+
+list = JOIN timesheet_summary BY (driverId), drivers BY (driverId);
+
+list = FOREACH list Generate drivers::driverId AS Id,drivers::name,drivers::wage_plan,timesheet_summary::hours AS Total_hours,timesheet_summary::miles AS total_miles;
+
+STORE list INTO 'myData/list' USING PigStorage(',');
+

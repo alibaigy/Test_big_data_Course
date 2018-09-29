@@ -1,0 +1,1 @@
+pig -x local -param_file <parameter filename> <pig script>

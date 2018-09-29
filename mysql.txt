@@ -1,0 +1,4 @@
+[cloudera@quickstart ~]$ mysql -u retail_dba -p
+[cloudera@quickstart ~]$ mysql -u root -p
+
+(password : cloudera )
