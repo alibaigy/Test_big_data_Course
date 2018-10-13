@@ -69,3 +69,8 @@ from
 group by m.title,tag3.tag,tag3.tag_cnt;
 
 
+
+
+
+-- running hive script
+hive -f yourscript.hql

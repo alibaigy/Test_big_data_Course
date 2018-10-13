@@ -1,0 +1,8 @@
+impala-shell;
+show databases;
+invalidate metadata;
+refresh <database name>;
+profile;
+explain <a query>;
+summary;
+insert overwrite table <table name> where <field name> != <record key>; : For deleting a record
