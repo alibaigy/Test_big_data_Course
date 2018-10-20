@@ -1,0 +1,11 @@
+-- Excercise on sample_data.txt from lecture 1
+---------------------------------------------------
+SCALA						PYTHON
+
+spark-shell					pyspark
+val x = sc.textFile("<your file>")		x = sc.textFile("<your file>")
+val y = x.map(_.split('[')(1))			y = x.map(lambda x: x.split('[')[1])	
+val z = y.map(_.split(':')(0))			z = y.map(lambda x: x.split(':')[0])	
+val a = z.map((_,1))				a = z.map(lambda x: (x,1))
+val b = a.reduceByKey(_+_)			b = a.reduceByKey(lambda a,b: a+b)
+b.collect					b.collect()
