@@ -1,0 +1,34 @@
+NameNode:
+ec2-18-224-136-71.us-east-2.compute.amazonaws.com
+18.224.136.71
+
+
+
+DataNode01:
+ec2-18-216-114-86.us-east-2.compute.amazonaws.com
+18.216.114.86
+
+
+DataNode02:
+ec2-18-219-29-66.us-east-2.compute.amazonaws.com
+18.219.29.66
+
+
+DataNode03:
+ec2-18-220-67-137.us-east-2.compute.amazonaws.com
+18.220.67.137
+
+
+Important note:
+==================================================================================
+in step 18: instead of <DNS of namenode> we put the DNS of our namenode up there
+
+in step 28: 
+cd hadoop/etc/hadoop
+vi master (creates a new file , add DSN of NameNode)
+vi slaves (add DNS of DataNodes)
+
+
+in step 29:
+It's all small letters
+

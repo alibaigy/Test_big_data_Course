@@ -9,3 +9,10 @@ val z = y.map(_.split(':')(0))			z = y.map(lambda x: x.split(':')[0])
 val a = z.map((_,1))				a = z.map(lambda x: (x,1))
 val b = a.reduceByKey(_+_)			b = a.reduceByKey(lambda a,b: a+b)
 b.collect					b.collect()
+
+
+
+
+val inputFile = sc.textFile("/myData/employee.txt")
+case class employee (firstname:String,lastname:String, deptId:Int)
+val finalDf = inputFile.map(x=>x.split(",")).map(e=>employee(e(0),e(1),e(2).toInt)).toDF()
