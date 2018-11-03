@@ -21,7 +21,7 @@ ec2-18-220-67-137.us-east-2.compute.amazonaws.com
 
 Important note:
 ==================================================================================
-in step 18: instead of <DNS of namenode> we put the DNS of our namenode up there
+in step 18: instead of <DNS of namenode> we put the DNS of our namenode up there, started by hdfs:// (example: hdfs://ec2-18-224-136-71.us-east-2.compute.amazonaws.com)
 
 in step 28: 
 cd hadoop/etc/hadoop
@@ -32,3 +32,7 @@ vi slaves (add DNS of DataNodes)
 in step 29:
 It's all small letters
 
+
+
+
+<public DNS>:50070 will show the website with stats of the hdfs
