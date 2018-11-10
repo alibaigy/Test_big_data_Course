@@ -1,0 +1,26 @@
+
+
+
+if you add the following code in this file:
+sudo vi /etc/hive/conf.dist/.hiverc
+
+--------------------------------------------------
+ADD JAR /usr/lib/hive/lib/hive-contrib.jar;
+set hive.cli.print.header=true;
+set hive.cli.print.current.db=true;
+add JAR /home/cloudera/Desktop/AgeGroup.jar;
+create temporary function agegroup  as 'udf.AgeGroup';
+--------------------------------------------------
+
+then every time you run Hive it will create the temporary function.
+
+
+if you want to create the file permanently, you should enter this command:
+hive (mydb)> create function agegroup as 'udf.AgeGroup' using jar 'hdfs://localhost:8020/user/cloudera/AgeGroup.jar';
+
+
+the 8020 port comes from site-core.xml
+
+
+
+

@@ -1,0 +1,38 @@
+[cloudera@quickstart ~]$ hadoop fs -mkdir /StoreX
+[cloudera@quickstart ~]$ hadoop fs -copyFromLocal Desktop/trans_log.csv /myData
+-----------------------------------------------------------------------
+hive (stores)> create database stores location '/StoreX'
+
+hive (stores)> create table Store (store_id int , store_num varchar(10), city varchar (25), address varchar (100), open_date string, close_date string) row format delimited fields terminated by ',';
+
+hive (stores)> load data local inpath 'Desktop/store.csv' into table store;
+
+hive (stores)> create table employee (employee_id int, employee_num int, store_num varchar (25), employee_name varchar (50), Joining_date string, designation varchar(50)) row format delimited fields terminated by ',';
+
+hive (stores)> load data local inpath 'Desktop/employee.csv' into table employee;
+
+hive (stores)> create table promotion (Promo_code_id int, promo_code varchar(20), description varchar(50), promo_start_date string, Promo_end_date string) row format delimited fields terminated by ',';
+
+hive (stores)>  load data local inpath 'Desktop/promotions.csv' into table promotion;
+
+hive (stores)> create table loyalty ( Loyalty_member_num int, cust_num int, card_no varchar(10), joining_date string, points float) row format delimited fields terminated by ',';
+
+hive (stores)> load data local inpath 'Desktop/loyalty.csv' into table loyalty;
+
+hive (stores)> create table product (product_id int, product_code varchar(50), add_date string, remove_Date string) row format delimited fields terminated by ',';
+
+hive (stores)> load data local inpath 'Desktop/product.csv' into table product;
+
+hive (stores)> create table trans_code (Trans_code_id int , trans_code varchar(2),description varchar(100)) row format delimited fields terminated by ',';
+
+hive (stores)> load data local inpath 'Desktop/trans_code.csv' into table trans_code;
+-----------------------------------------------------------------------------------------
+from pyspark import SparkContext, SparkConf
+
+conf = SparkConf().setAppName("myFirstApp").setMaster("local")
+sc = SparkContext(conf=conf)
+
+textFile = sc.textFile("/myData/trans_log.csv")
+textFile.first()
+
+
