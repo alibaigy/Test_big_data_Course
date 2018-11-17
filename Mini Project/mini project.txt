@@ -28,11 +28,21 @@ hive (stores)> create table trans_code (Trans_code_id int , trans_code varchar(2
 hive (stores)> load data local inpath 'Desktop/trans_code.csv' into table trans_code;
 -----------------------------------------------------------------------------------------
 from pyspark import SparkContext, SparkConf
+from pyspark.sql import SQLContext
+from pyspark.sql.types import *
 
 conf = SparkConf().setAppName("myFirstApp").setMaster("local")
 sc = SparkContext(conf=conf)
-
 textFile = sc.textFile("/myData/trans_log.csv")
 textFile.first()
+
+
+from pyspark import SQLContext
+from pyspark.sql import Row
+sql_c = SQLContext(sc)
+textFile = sc.textFile("/myData/trans_log.csv")
+textFile.collect()
+readFile = textFile.map(lambda x: x.split(',')).map(lambda x: Row(F1 = x[0], F2 = x[1], F3 = x[2],F4 = x[3],F5 = x[4],F6 = x[5],F7 = x[6],F8 = x[7],F9 = x[8],F10 = x[9],F11 = x[10]))
+readFile.collect()
 
 
