@@ -1,0 +1,60 @@
+To import a file into a partitioned table based on date
+format of input data:
+tx_id,product_id,trans_date,amt,qty
+1,CS1133,01-Apr-12,61,2
+2,CS3630,01-Apr-12,44,3
+3,CS3327,01-Apr-12,57,1
+4,CS1874,01-Apr-12,70,2
+
+
+
+In impala:
+----------------------------------------------------------------
+-- First, creating a staging table
+[quickstart.cloudera:21000] > CREATE TABLE stage_transaction (tx_id int, product_id int,trans_dt string, amt double, qty double) row format delimited fields terminated by ',';
+
+-- This command shows how and where the table is created
+show create table stage_transaction      
+
+-- The result of that command is as follow:
++----------------------------------------------------------------------------------+
+| result                                                                           |
++----------------------------------------------------------------------------------+
+| CREATE TABLE default.stage_transaction (                                         |
+|   tx_id INT,                                                                     |
+|   product_id INT,                                                                |
+|   trans_dt STRING,                                                               |
+|   amt DOUBLE,                                                                    |
+|   qty DOUBLE                                                                     |
+| )                                                                                |
+| ROW FORMAT DELIMITED FIELDS TERMINATED BY ','                                    |
+| WITH SERDEPROPERTIES ('serialization.format'=',', 'field.delim'=',')             |
+| STORED AS TEXTFILE                                                               |
+| LOCATION 'hdfs://quickstart.cloudera:8020/user/hive/warehouse/stage_transaction' |
+|                                                                                  |
++----------------------------------------------------------------------------------+
+
+-- Now, out of impala, we save the file in the hdfs , in the directory of the table
+[cloudera@quickstart ~]$ hadoop fs -copyFromLocal Desktop/transaction /user/hive/warehouse/stage_transaction
+
+-- Now, back in impala:
+[quickstart.cloudera:21000] > refresh stage_transaction;
+[quickstart.cloudera:21000] > select * from stage_transaction;
+
+-- Now we create the partitioned table and insert data from staging table:
+[quickstart.cloudera:21000] > CREATE TABLE transaction (tx_id int, product_id int, amt double, qty double) partitioned by (trans_dt string) row format delimited fields terminated by ',';
+
+[quickstart.cloudera:21000] > insert into transaction partition (trans_dt) select tx_id, product_id, amt, qty , trans_dt from stage_transaction;
+
+-- Now if we look into partition table's location, the list of files look like this:
+
+drwxr-xr-x   - impala supergroup          0 2018-11-24 09:19 /user/hive/warehouse/transaction/trans_dt=31-Oct-12
+drwxr-xr-x   - impala supergroup          0 2018-11-24 09:19 /user/hive/warehouse/transaction/trans_dt=31-Oct-13
+drwxr-xr-x   - impala supergroup          0 2018-11-24 09:19 /user/hive/warehouse/transaction/trans_dt=31-Oct-14
+drwxr-xr-x   - impala supergroup          0 2018-11-24 09:19 /user/hive/warehouse/transaction/trans_dt=trans_date
+
+
+
+
+alter table transaction add partition (trans_dt='DUMMY') location  '/data/some/other/location';        --- This command adds a specific ('DUMMY') partition after the file is transferred to location
+alter table transaction drop partition (trans_dt='DUMMY');        --- This command drops a specific ('DUMMY') partition 

@@ -26,6 +26,41 @@ hive (stores)> load data local inpath 'Desktop/product.csv' into table product;
 hive (stores)> create table trans_code (Trans_code_id int , trans_code varchar(2),description varchar(100)) row format delimited fields terminated by ',';
 
 hive (stores)> load data local inpath 'Desktop/trans_code.csv' into table trans_code;
+
+hive (stores)> create table pos (Trans_seq int, Trans_code string, event_code int, store_num string, POS_emp_num int, lane int, date string,time string);
+
+
+
+-----------------------------------------------------------------------------------
+-- [cloudera@quickstart ~]$ impala-shell
+start.cloudera:21000] > create table trans_log (F01 string,F02 string,F03 string,F04 string,F05 string,F06 string,F07 string,F08 string,F09 string,F10 string,F11 string) row format delimited fields terminated by ',';
+
+-- back in Cloudera
+[cloudera@quickstart ~]$ hadoop fs -copyFromLocal Desktop/trans_log /StoreX/trans_log;
+
+-- [cloudera@quickstart ~]$ impala-shell
+[quickstart.cloudera:21000] > refresh trans_log;
+[quickstart.cloudera:21000] > select * from trans_log;
+
+[quickstart.cloudera:21000] > insert into pos select cast(f01 as int), f02, cast(f03 as int), f04,cast(f05 as int), cast(f06 as int), substr(f07,1,10), substr(f07,12,5) from trans_log where f02 = 'PS';
+
+---------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 -----------------------------------------------------------------------------------------
 from pyspark import SparkContext, SparkConf
 from pyspark.sql import SQLContext
@@ -42,7 +77,23 @@ from pyspark.sql import Row
 sql_c = SQLContext(sc)
 textFile = sc.textFile("/myData/trans_log.csv")
 textFile.collect()
-readFile = textFile.map(lambda x: x.split(',')).map(lambda x: Row(F1 = x[0], F2 = x[1], F3 = x[2],F4 = x[3],F5 = x[4],F6 = x[5],F7 = x[6],F8 = x[7],F9 = x[8],F10 = x[9],F11 = x[10]))
+readFile = textFile.map(lambda x: x.split(',')).map(lambda x: Row(F01 = x[0], F02 = x[1], F03 = x[2],F04 = x[3],F05 = x[4],F06 = x[5],F07 = x[6],F08 = x[7],F09 = x[8],F10 = x[9],F11 = x[10]))
 readFile.collect()
+df = sqlContext.createDataFrame(readFile)
+df.registerTempTable("Trans_log")
+PS = sqlContext.sql(" Select * from trans_log")
+PS.show()
 
+PS = sqlContext.sql("Select F01,F02,F03,F04,F05,F06,F07 from trans_log where F02='PS'")
+TT = sqlContext.sql("Select F01,F02,F03,F04,F05,F06,F07,F08,F09,F10,F11 from trans_log where F02='TT'")
+LL = sqlContext.sql("Select F01,F02,F03,F04,F05,F06,F07 from trans_log where F02='LL'")
+PP = sqlContext.sql("Select F01,F02,F03,F04,F05,F06,F07 from trans_log where F02='PP'")
+BB = sqlContext.sql("Select F01,F02,F03,F04,F05,F06,F07,F08,F09 from trans_log where F02='BB'")
+CC = sqlContext.sql("Select F01,F02,F03,F04,F05,F06,F07 from trans_log where F02='CC'")
 
+PS.rdd.map(lambda x: ",".join(map(str, x))).coalesce(1).saveAsTextFile("/mydata/ps")
+TT.rdd.map(lambda x: ",".join(map(str, x))).coalesce(1).saveAsTextFile("/mydata/tt")
+LL.rdd.map(lambda x: ",".join(map(str, x))).coalesce(1).saveAsTextFile("/mydata/ll")
+PP.rdd.map(lambda x: ",".join(map(str, x))).coalesce(1).saveAsTextFile("/mydata/pp")
+BB.rdd.map(lambda x: ",".join(map(str, x))).coalesce(1).saveAsTextFile("/mydata/bb")
+CC.rdd.map(lambda x: ",".join(map(str, x))).coalesce(1).saveAsTextFile("/mydata/cc")
