@@ -27,7 +27,6 @@ hive (stores)> create table trans_code (Trans_code_id int , trans_code varchar(2
 
 hive (stores)> load data local inpath 'Desktop/trans_code.csv' into table trans_code;
 
-hive (stores)> create table pos (Trans_seq int, Trans_code string, event_code int, store_num string, POS_emp_num int, lane int, date string,time string);
 
 
 
@@ -42,15 +41,50 @@ start.cloudera:21000] > create table trans_log (F01 string,F02 string,F03 string
 [quickstart.cloudera:21000] > refresh trans_log;
 [quickstart.cloudera:21000] > select * from trans_log;
 
+
+[quickstart.cloudera:21000] > create table pos (Trans_seq int, Trans_code string, event_code int, store_num string, POS_emp_num int, lane int, dates string,time string);
+
+[quickstart.cloudera:21000] > create table cashdoor (Trans_seq int, Trans_code string, event_code int, store_num string, POS_emp_num int, lane int, dates string,time string);
+
+[quickstart.cloudera:21000] > create table cash (Trans_seq int, Trans_code string, payment_mode string, amount double, 	change_in_return double, store_num string, POS_emp_num int, lane int, dates string,time string);
+
+[quickstart.cloudera:21000] > create table card (Trans_seq int, Trans_code string, payment_mode string, encrypted_card string, amount double, store_num string, POS_emp_num int, lane int, dates string,time string);
+
+[quickstart.cloudera:21000] > create table loyaltycard (Trans_seq int, Trans_code string, loyalty_card_no string, store_num string, POS_emp_num int, lane int, dates string,time string);
+
+[quickstart.cloudera:21000] > create table Promo (Trans_seq int, Trans_code string, Promo_code string, store_num string, POS_emp_num int, lane int, dates string,time string);
+
+[quickstart.cloudera:21000] > create table staging_Items (Trans_id string,Trans_seq int, Trans_code string, scan_seq int, Product_code string, amount double, discount double, add_remove_flag int, store_num string, POS_emp_num int, lane int, dates string,time string);
+
+
+[quickstart.cloudera:21000] > create table Items (Trans_id string,Trans_seq int, Trans_code string, scan_seq int, Product_code string, amount double, discount double, add_remove_flag int, store_num string, POS_emp_num int, lane int) partitioned by ( dates string) row format delimited fields terminated by ',';
+
+
+
 [quickstart.cloudera:21000] > insert into pos select cast(f01 as int), f02, cast(f03 as int), f04,cast(f05 as int), cast(f06 as int), substr(f07,1,10), substr(f07,12,5) from trans_log where f02 = 'PS';
 
----------------------------------
+[quickstart.cloudera:21000] > insert into cashdoor select cast(f01 as int), f02, cast(f03 as int), f04,cast(f05 as int), cast(f06 as int), substr(f07,1,10), substr(f07,12,5) from trans_log where f02 = 'CC';
+
+[quickstart.cloudera:21000] > insert into cash select cast(f01 as int), f02, f03, cast(f04 as double) , cast(f05 as double),  f06,cast(f07 as int), cast(f08 as int), substr(f09,1,10), substr(f09,12,5) from trans_log where f02 = 'BB' AND f03 = 'CASH';
+
+[quickstart.cloudera:21000] > insert into card select cast(f01 as int), f02, f03,f04 , cast(f05 as double),  f06,cast(f07 as int), cast(f08 as int), substr(f09,1,10), substr(f09,12,5) from trans_log where f02 = 'BB' AND f03 = 'CARD';
+
+[quickstart.cloudera:21000] > insert into loyaltycard select cast(f01 as int), f02, f03 , f04,cast(f05 as int), cast(f06 as int), substr(f07,1,10), substr(f07,12,5) from trans_log where f02 = 'LL';
+
+[quickstart.cloudera:21000] > insert into Promo select cast(f01 as int), f02, f03 , f04,cast(f05 as int), cast(f06 as int), substr(f07,1,10), substr(f07,12,5) from trans_log where f02 = 'PP';
+
+[quickstart.cloudera:21000] > insert into staging_Items select concat(substr(f11,1,4),substr(f11,6,2),substr(f11,9,2),concat(substr('00000',1,5-char_length(cast(store.store_id as string))) ,cast(store.store_id as string)),concat(substr('00',1,2-char_length(f10)),f10),concat(substr('0000',1,4-char_length(f01)),f01)), cast(f01 as int), f02, cast(f03 as int) , f04,cast(f05 as double), cast(f06 as double), cast(f07 as int),f08,cast(f09 as int), cast(f10 as int), substr(f11,1,10), substr(f11,12,5) from trans_log left join store on store.store_num = trans_log.f08 where f02 = 'TT';
+
+[quickstart.cloudera:21000] > insert into items partition (dates) select Trans_id ,Trans_seq , Trans_code, scan_seq , Product_code , amount , discount , add_remove_flag , store_num , POS_emp_num , lane, dates from staging_Items;
 
 
 
+--------------------------------- To export data to mySQL
+
+mysql> create table Items (Trans_id varchar(50),Trans_seq int, Trans_code varchar(10), scan_seq int, Product_code varchar(25), amount double, discount double, add_remove_flag int, store_num varchar(10), POS_emp_num int, lane int);
 
 
-
+[cloudera@quickstart ~]$ sqoop export --connect jdbc:mysql://localhost:3306/retail_db --username retail_dba --password cloudera --table Items --fields-terminated-by ',' --export-dir /StoreX/items/dates=2018-01-01
 
 
 

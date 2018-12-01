@@ -46,6 +46,9 @@ show create table stage_transaction
 
 [quickstart.cloudera:21000] > insert into transaction partition (trans_dt) select tx_id, product_id, amt, qty , trans_dt from stage_transaction;
 
+-- To see partition info:
+[quickstart.cloudera:21000] > show partitions transaction;
+
 -- Now if we look into partition table's location, the list of files look like this:
 
 drwxr-xr-x   - impala supergroup          0 2018-11-24 09:19 /user/hive/warehouse/transaction/trans_dt=31-Oct-12
