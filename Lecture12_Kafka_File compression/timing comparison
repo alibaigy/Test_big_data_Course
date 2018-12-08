@@ -1,0 +1,65 @@
+Time taken: 30.448 seconds, Fetched: 1 row(s)
+hive (mydb)> select count(*) from text_test;
+
+
+Time taken: 32.358 seconds, Fetched: 1 row(s)
+hive (mydb)> select count(*) from parquet_test_no_compression;
+
+
+Time taken: 27.783 seconds, Fetched: 1 row(s)
+hive (mydb)> select count(*) from parquet_test_snappy_compression;
+
+
+Time taken: 29.307 seconds, Fetched: 1 row(s)
+hive (mydb)> select count(*) from parquet_test_gzip_compression;
+
+
+Time taken: 34.433 seconds, Fetched: 1 row(s)
+hive (mydb)> select count(*) from avro_test;
+
+==================================================================================
+
+Time taken: 27.406 seconds
+hive (mydb)> insert into parquet_test_no_compression select * from text_test;
+
+
+Time taken: 28.505 seconds
+hive (mydb)> insert into parquet_test_snappy_compression  select * from text_test;
+
+
+Time taken: 30.086 seconds
+hive (mydb)> insert into parquet_test_gzip_compression select * from text_test;
+
+
+Time taken: 23.138 seconds
+hive (mydb)> insert into avro_test select * from text_test;
+
+====================================================================================
+
+Time taken: 75.509 seconds, Fetched: 1 row(s)
+hive (mydb)> SELECT avg( t1.d1 ) from text_test t1 join text_test t2 on t1.d3 = t2.d3 and t1.d4 = t2.d4 where t1.d5<3;
+
+
+Time taken: 57.95 seconds, Fetched: 1 row(s)
+hive (mydb)> SELECT avg( t1.d1 ) from parquet_test_no_compression t1 join parquet_test_no_compression t2 on t1.d3 = t2.d3 and t1.d4 = t2.d4 where t1.d5<3;
+
+
+Time taken: 69.168 seconds, Fetched: 1 row(s)
+hive (mydb)> SELECT avg( t1.d1 ) from parquet_test_snappy_compression t1 join parquet_test_snappy_compression t2 on t1.d3 = t2.d3 and t1.d4 = t2.d4 where t1.d5<3;
+
+
+Time taken: 66.769 seconds, Fetched: 1 row(s)
+hive (mydb)> SELECT avg( t1.d1 ) from parquet_test_gzip_compression t1 join parquet_test_gzip_compression t2 on t1.d3 = t2.d3 and t1.d4 = t2.d4 where t1.d5<3;
+
+
+Time taken: 87.096 seconds, Fetched: 1 row(s)
+hive (mydb)> SELECT avg( t1.d1 ) from avro_test t1 join avro_test t2 on t1.d3 = t2.d3 and t1.d4 = t2.d4 where t1.d5<3;
+
+
+
+
+
+
+
+
+
